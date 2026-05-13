@@ -27,7 +27,7 @@ dist-ssr/
 .eslintcache
 npm-debug.log*
 
-# Environment files — never commit real .env files
+# Environment files - never commit real .env files
 .env
 .env.*
 !.env.example
@@ -49,3 +49,6 @@ desktop.ini
 .idea/
 *.swp
 *.swo
+
+# Local execution reports
+reports/
