@@ -1,6 +1,7 @@
 import json
 
-import google.generativeai as genai
+from google import genai
+from google.genai import types
 
 from config.settings import settings
 
@@ -15,16 +16,8 @@ VALID_CLASSIFICATIONS = {
 VALID_URGENCIES = {"Low", "Medium", "High"}
 
 
-genai.configure(api_key=settings.gemini_api_key)
-
-extraction_model = genai.GenerativeModel(
-    model_name="gemini-2.0-flash",
-    generation_config={"temperature": 0},
-)
-
-report_model = genai.GenerativeModel(
-    model_name="gemini-2.5-pro",
-    generation_config={"temperature": 1},
+gemini_client = genai.Client(
+    api_key=settings.gemini_api_key,
 )
 
 
@@ -79,7 +72,14 @@ section if missing_documents is empty]
 section otherwise. State clearly why escalation is
 warranted and which team lead should be notified]"""
 
-    response = report_model.generate_content([system_instruction, user_message])
+    response = gemini_client.models.generate_content(
+        model="gemini-2.5-pro",
+        contents=user_message,
+        config=types.GenerateContentConfig(
+            system_instruction=system_instruction,
+            temperature=1,
+        ),
+    )
     response_text = response.text.strip()
 
     if not response_text:
@@ -98,15 +98,7 @@ Return valid JSON only. No explanation. No markdown
 formatting. No code fences. Raw JSON object only."""
 
 
-def _generation_config():
-    try:
-        return genai.types.GenerationConfig(response_mime_type="application/json")
-    except TypeError:
-        return None
-
-
 def extract_fields(raw_text: str) -> dict:
-    generation_config = _generation_config()
     user_message = f"""Document content:
 {raw_text}
 
@@ -137,26 +129,26 @@ Rules:
 - Return null for fields not present in the document"""
 
     try:
-        if generation_config is not None:
-            response = extraction_model.generate_content(
-                [SYSTEM_INSTRUCTION, user_message],
-                generation_config=generation_config,
-            )
-        else:
-            response = extraction_model.generate_content([SYSTEM_INSTRUCTION, user_message])
+        response = gemini_client.models.generate_content(
+            model="gemini-2.0-flash",
+            contents=user_message,
+            config=types.GenerateContentConfig(
+                system_instruction=SYSTEM_INSTRUCTION,
+                temperature=0,
+            ),
+        )
         response_text = response.text.strip()
         parsed = json.loads(response_text)
     except Exception:
         try:
-            if generation_config is not None:
-                response = extraction_model.generate_content(
-                    [SYSTEM_INSTRUCTION, user_message],
-                    generation_config=generation_config,
-                )
-            else:
-                response = extraction_model.generate_content(
-                    [SYSTEM_INSTRUCTION, user_message]
-                )
+            response = gemini_client.models.generate_content(
+                model="gemini-2.0-flash",
+                contents=user_message,
+                config=types.GenerateContentConfig(
+                    system_instruction=SYSTEM_INSTRUCTION,
+                    temperature=0,
+                ),
+            )
             response_text = response.text.strip()
             parsed = json.loads(response_text)
         except Exception as exc:

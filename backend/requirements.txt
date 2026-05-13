@@ -3,6 +3,6 @@ uvicorn[standard]
 pydantic
 pydantic-settings
 boto3
-google-generativeai
+google-genai
 python-multipart
 python-dotenv
