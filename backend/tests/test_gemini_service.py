@@ -146,3 +146,93 @@ def test_extract_fields_accepts_all_three_valid_urgency_values(
         result = gemini_service.extract_fields("Customer requests banking support")
 
         assert result["urgency"] == urgency
+
+
+@pytest.fixture
+def valid_extracted():
+    return {
+        "classification": "SME Advisory",
+        "customer_name": "Akosua Mensah",
+        "request_type": "SME loan application",
+        "business_type": "SME",
+        "amount_mentioned": "GHS 50000",
+        "urgency": "Medium",
+        "missing_documents": ["audited financials"],
+        "risk_flags": [],
+        "recommended_team": "SME Advisory Team",
+        "confidence_score": 85,
+    }
+
+
+def test_generate_report_returns_markdown_string(monkeypatch, valid_extracted):
+    markdown_response = "## Summary\nAkosua Mensah requests SME loan support."
+    generate_content = Mock(return_value=response_with_text(markdown_response))
+    monkeypatch.setattr(gemini_service.report_model, "generate_content", generate_content)
+
+    result = gemini_service.generate_report(
+        valid_extracted,
+        "Akosua Mensah requests an SME loan.",
+    )
+
+    assert result == markdown_response
+    generate_content.assert_called_once()
+
+
+def test_generate_report_raises_gemini_error_on_empty_response(
+    monkeypatch, valid_extracted
+):
+    generate_content = Mock(return_value=response_with_text(""))
+    monkeypatch.setattr(gemini_service.report_model, "generate_content", generate_content)
+
+    with pytest.raises(RuntimeError) as exc_info:
+        gemini_service.generate_report(
+            valid_extracted,
+            "Akosua Mensah requests an SME loan.",
+        )
+
+    assert "GEMINI_ERROR" in str(exc_info.value)
+
+
+def test_generate_report_raises_gemini_error_on_whitespace_only_response(
+    monkeypatch, valid_extracted
+):
+    generate_content = Mock(return_value=response_with_text("   "))
+    monkeypatch.setattr(gemini_service.report_model, "generate_content", generate_content)
+
+    with pytest.raises(RuntimeError) as exc_info:
+        gemini_service.generate_report(
+            valid_extracted,
+            "Akosua Mensah requests an SME loan.",
+        )
+
+    assert "GEMINI_ERROR" in str(exc_info.value)
+
+
+def test_generate_report_does_not_call_extract_fields_or_extraction_model(
+    monkeypatch, valid_extracted
+):
+    extract_fields = Mock()
+    extraction_generate_content = Mock()
+    report_generate_content = Mock(
+        return_value=response_with_text("## Summary\nPrepared report.")
+    )
+    monkeypatch.setattr(gemini_service, "extract_fields", extract_fields)
+    monkeypatch.setattr(
+        gemini_service.extraction_model,
+        "generate_content",
+        extraction_generate_content,
+    )
+    monkeypatch.setattr(
+        gemini_service.report_model,
+        "generate_content",
+        report_generate_content,
+    )
+
+    gemini_service.generate_report(
+        valid_extracted,
+        "Akosua Mensah requests an SME loan.",
+    )
+
+    extract_fields.assert_not_called()
+    extraction_generate_content.assert_not_called()
+    report_generate_content.assert_called_once()

@@ -22,7 +22,72 @@ extraction_model = genai.GenerativeModel(
     generation_config={"temperature": 0},
 )
 
-# Report model (gemini-2.5-pro) — added in Phase 8
+report_model = genai.GenerativeModel(
+    model_name="gemini-2.5-pro",
+    generation_config={"temperature": 1},
+)
+
+
+def generate_report(extracted: dict, raw_text: str) -> str:
+    system_instruction = """You are a senior banking operations analyst preparing
+an internal staff handoff report. Your reports are
+factual, concise, and operationally useful. You do not
+fabricate information. You do not make financial
+decisions. You prepare routing and preparation summaries
+for the appropriate internal team."""
+
+    user_message = f"""Prepare a staff handoff report based on the following
+extracted information from a customer document.
+
+Classification: {extracted['classification']}
+Customer Name: {extracted['customer_name']}
+Request Type: {extracted['request_type']}
+Business Type: {extracted['business_type']}
+Amount Mentioned: {extracted['amount_mentioned']}
+Urgency: {extracted['urgency']}
+Missing Documents: {extracted['missing_documents']}
+Risk Flags: {extracted['risk_flags']}
+Recommended Team: {extracted['recommended_team']}
+Confidence Score: {extracted['confidence_score']}
+
+Original document excerpt:
+{raw_text}
+
+Generate the report in this exact markdown structure:
+
+## Summary
+[2-3 factual sentences describing the request]
+
+## Classification
+[Restate classification and recommended team]
+
+## Required Next Steps
+1. [First required action]
+2. [Second required action]
+[Continue as needed, minimum 2 steps]
+
+## Missing Information
+[List missing documents if any. Omit this entire
+section if missing_documents is empty]
+
+## Source Excerpts
+> [Direct quote from document supporting classification]
+> [Additional quote if relevant]
+
+## Escalation Note
+[Include only when urgency is High. Omit this entire
+section otherwise. State clearly why escalation is
+warranted and which team lead should be notified]"""
+
+    response = report_model.generate_content([system_instruction, user_message])
+    response_text = response.text.strip()
+
+    if not response_text:
+        raise RuntimeError(
+            "GEMINI_ERROR: report generation returned an empty response"
+        )
+
+    return response_text
 
 
 SYSTEM_INSTRUCTION = """You are a banking document analyst processing
