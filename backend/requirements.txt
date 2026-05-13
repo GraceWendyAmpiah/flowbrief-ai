@@ -1,0 +1,2 @@
+# FlowBrief AI — Python dependencies
+# Populated in backend Phase 2.
