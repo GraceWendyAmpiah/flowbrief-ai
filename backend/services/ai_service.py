@@ -97,6 +97,28 @@ Return valid JSON only. No explanation. No markdown
 formatting. No code fences. Raw JSON object only."""
 
 
+def _call_extraction_model(user_message: str) -> str:
+    response = openai_client.chat.completions.create(
+        model="llama-3.1-8b-instant",
+        messages=[
+            {"role": "system", "content": SYSTEM_INSTRUCTION},
+            {"role": "user", "content": user_message}
+        ],
+        response_format={"type": "json_object"}
+    )
+    return response.choices[0].message.content.strip()
+
+
+def _parse_json_response(raw: str) -> dict:
+    cleaned = raw
+    if cleaned.startswith("```"):
+        lines = cleaned.splitlines()
+        lines = [l for l in lines
+                 if not l.strip().startswith("```")]
+        cleaned = "\n".join(lines).strip()
+    return json.loads(cleaned)
+
+
 def extract_fields(raw_text: str) -> dict:
     user_message = f"""Document content:
 {raw_text}
@@ -127,41 +149,43 @@ Rules:
 - Do not fabricate information not present in the document
 - Return null for fields not present in the document"""
 
+    # Attempt 1 - API call
     try:
-        response = openai_client.chat.completions.create(
-            model="llama-3.1-8b-instant",
-            messages=[
-                {"role": "system", "content": SYSTEM_INSTRUCTION},
-                {"role": "user", "content": user_message}
-            ],
-            response_format={"type": "json_object"}
+        raw_response = _call_extraction_model(user_message)
+    except Exception as e:
+        raise RuntimeError(
+            f"GEMINI_ERROR: API call failed: {e}"
         )
-        response_text = response.choices[0].message.content.strip()
-        parsed = json.loads(response_text)
+
+    # Attempt 1 - JSON parse
+    try:
+        parsed = _parse_json_response(raw_response)
     except Exception:
+        # Attempt 2 - retry API call once on parse failure
         try:
-            response = openai_client.chat.completions.create(
-                model="llama-3.1-8b-instant",
-                messages=[
-                    {"role": "system", "content": SYSTEM_INSTRUCTION},
-                    {"role": "user", "content": user_message}
-                ],
-                response_format={"type": "json_object"}
-            )
-            response_text = response.choices[0].message.content.strip()
-            parsed = json.loads(response_text)
-        except Exception as exc:
+            raw_response = _call_extraction_model(user_message)
+        except Exception as e:
             raise RuntimeError(
-                "GEMINI_ERROR: failed to parse JSON response after two attempts"
-            ) from exc
+                f"GEMINI_ERROR: API call failed on retry: {e}"
+            )
+        # Attempt 2 - JSON parse
+        try:
+            parsed = _parse_json_response(raw_response)
+        except Exception:
+            raise RuntimeError(
+                "GEMINI_ERROR: failed to parse JSON response "
+                "after two attempts"
+            )
 
     if parsed.get("classification") not in VALID_CLASSIFICATIONS:
         raise RuntimeError(
-            f"GEMINI_ERROR: invalid classification value: {parsed.get('classification')}"
+            f"GEMINI_ERROR: invalid classification value: "
+            f"{parsed.get('classification')}"
         )
     if parsed.get("urgency") not in VALID_URGENCIES:
         raise RuntimeError(
-            f"GEMINI_ERROR: invalid urgency value: {parsed.get('urgency')}"
+            f"GEMINI_ERROR: invalid urgency value: "
+            f"{parsed.get('urgency')}"
         )
 
     return parsed
