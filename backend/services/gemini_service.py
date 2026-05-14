@@ -104,25 +104,25 @@ def extract_fields(raw_text: str) -> dict:
 
 Extract and return this exact JSON schema:
 {{
-  'customer_name': string or null,
-  'request_type': string,
-  'business_type': string or null,
-  'amount_mentioned': string or null,
-  'urgency': 'Low' or 'Medium' or 'High',
-  'missing_documents': [array of strings],
-  'risk_flags': [array of strings],
-  'recommended_team': string,
-  'confidence_score': integer between 0 and 100,
-  'classification': one of exactly: KYC, Complaint,
+  \"customer_name\": string or null,
+  \"request_type\": string,
+  \"business_type\": string or null,
+  \"amount_mentioned\": string or null,
+  \"urgency\": \"Low\" or \"Medium\" or \"High\",
+  \"missing_documents\": [array of strings],
+  \"risk_flags\": [array of strings],
+  \"recommended_team\": string,
+  \"confidence_score\": integer between 0 and 100,
+  \"classification\": one of exactly: KYC, Complaint,
     SME Advisory, Trade Finance, Account Opening
 }}
 
 Rules:
-- urgency must be exactly one of: Low, Medium, High
-- classification must be exactly one of the five
+- \"urgency\" must be exactly one of: \"Low\", \"Medium\", \"High\"
+- \"classification\" must be exactly one of the five
   categories listed, nothing else
-- missing_documents must be an array, empty if none
-- risk_flags must be an array, empty if none
+- \"missing_documents\" must be an array, empty if none
+- \"risk_flags\" must be an array, empty if none
 - confidence_score reflects your confidence in the
   accuracy of this extraction based on document clarity
 - Do not fabricate information not present in the document
@@ -135,6 +135,7 @@ Rules:
             config=types.GenerateContentConfig(
                 system_instruction=SYSTEM_INSTRUCTION,
                 temperature=0,
+                response_mime_type="application/json"
             ),
         )
         response_text = response.text.strip()
@@ -147,6 +148,7 @@ Rules:
                 config=types.GenerateContentConfig(
                     system_instruction=SYSTEM_INSTRUCTION,
                     temperature=0,
+                    response_mime_type="application/json"
                 ),
             )
             response_text = response.text.strip()
