@@ -7,7 +7,7 @@ from fastapi import APIRouter, File, Form, UploadFile, HTTPException
 from fastapi.responses import JSONResponse
 
 from models.case_model import CaseResponse
-from services import gemini_service
+from services import ai_service as gemini_service
 from services import dynamo_service
 from services import s3_service
 

@@ -13,5 +13,9 @@ Société Générale Ghana IT Developer application.
 
 ---
 
+## Tech Stack
+
+- AI layer: OpenAI API (gpt-4o-mini + gpt-4o)
+
 Full documentation in progress.
 See /docs for setup, deployment, and architecture guides.

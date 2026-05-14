@@ -1,10 +1,10 @@
-﻿from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env")
 
-    gemini_api_key: str
+    openai_api_key: str
     aws_region: str
     aws_access_key_id: str
     aws_secret_access_key: str

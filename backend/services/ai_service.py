@@ -1,7 +1,6 @@
 import json
 
-from google import genai
-from google.genai import types
+from openai import OpenAI
 
 from config.settings import settings
 
@@ -16,9 +15,7 @@ VALID_CLASSIFICATIONS = {
 VALID_URGENCIES = {"Low", "Medium", "High"}
 
 
-gemini_client = genai.Client(
-    api_key=settings.gemini_api_key,
-)
+openai_client = OpenAI(api_key=settings.openai_api_key)
 
 
 def generate_report(extracted: dict, raw_text: str) -> str:
@@ -72,15 +69,14 @@ section if missing_documents is empty]
 section otherwise. State clearly why escalation is
 warranted and which team lead should be notified]"""
 
-    response = gemini_client.models.generate_content(
-        model="gemini-2.5-pro",
-        contents=user_message,
-        config=types.GenerateContentConfig(
-            system_instruction=system_instruction,
-            temperature=1,
-        ),
+    response = openai_client.chat.completions.create(
+        model="gpt-4o",
+        messages=[
+            {"role": "system", "content": system_instruction},
+            {"role": "user", "content": user_message}
+        ]
     )
-    response_text = response.text.strip()
+    response_text = response.choices[0].message.content.strip()
 
     if not response_text:
         raise RuntimeError(
@@ -129,29 +125,27 @@ Rules:
 - Return null for fields not present in the document"""
 
     try:
-        response = gemini_client.models.generate_content(
-            model="gemini-2.0-flash",
-            contents=user_message,
-            config=types.GenerateContentConfig(
-                system_instruction=SYSTEM_INSTRUCTION,
-                temperature=0,
-                response_mime_type="application/json"
-            ),
+        response = openai_client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[
+                {"role": "system", "content": SYSTEM_INSTRUCTION},
+                {"role": "user", "content": user_message}
+            ],
+            response_format={"type": "json_object"}
         )
-        response_text = response.text.strip()
+        response_text = response.choices[0].message.content.strip()
         parsed = json.loads(response_text)
     except Exception:
         try:
-            response = gemini_client.models.generate_content(
-                model="gemini-2.0-flash",
-                contents=user_message,
-                config=types.GenerateContentConfig(
-                    system_instruction=SYSTEM_INSTRUCTION,
-                    temperature=0,
-                    response_mime_type="application/json"
-                ),
+            response = openai_client.chat.completions.create(
+                model="gpt-4o-mini",
+                messages=[
+                    {"role": "system", "content": SYSTEM_INSTRUCTION},
+                    {"role": "user", "content": user_message}
+                ],
+                response_format={"type": "json_object"}
             )
-            response_text = response.text.strip()
+            response_text = response.choices[0].message.content.strip()
             parsed = json.loads(response_text)
         except Exception as exc:
             raise RuntimeError(
