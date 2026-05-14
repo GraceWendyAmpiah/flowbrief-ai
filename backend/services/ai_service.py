@@ -15,7 +15,10 @@ VALID_CLASSIFICATIONS = {
 VALID_URGENCIES = {"Low", "Medium", "High"}
 
 
-openai_client = OpenAI(api_key=settings.openai_api_key)
+openai_client = OpenAI(
+    api_key=settings.groq_api_key,
+    base_url="https://api.groq.com/openai/v1"
+)
 
 
 def generate_report(extracted: dict, raw_text: str) -> str:
@@ -70,7 +73,7 @@ section otherwise. State clearly why escalation is
 warranted and which team lead should be notified]"""
 
     response = openai_client.chat.completions.create(
-        model="gpt-4o",
+        model="llama-3.3-70b-versatile",
         messages=[
             {"role": "system", "content": system_instruction},
             {"role": "user", "content": user_message}
@@ -126,7 +129,7 @@ Rules:
 
     try:
         response = openai_client.chat.completions.create(
-            model="gpt-4o-mini",
+            model="llama-3.1-8b-instant",
             messages=[
                 {"role": "system", "content": SYSTEM_INSTRUCTION},
                 {"role": "user", "content": user_message}
@@ -138,7 +141,7 @@ Rules:
     except Exception:
         try:
             response = openai_client.chat.completions.create(
-                model="gpt-4o-mini",
+                model="llama-3.1-8b-instant",
                 messages=[
                     {"role": "system", "content": SYSTEM_INSTRUCTION},
                     {"role": "user", "content": user_message}

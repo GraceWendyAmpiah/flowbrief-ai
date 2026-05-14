@@ -15,7 +15,8 @@ Société Générale Ghana IT Developer application.
 
 ## Tech Stack
 
-- AI layer: OpenAI API (gpt-4o-mini + gpt-4o)
+- AI layer: Groq API — llama-3.1-8b-instant + llama-3.3-70b-versatile
+  (OpenAI-compatible SDK, open-source Llama models)
 
 Full documentation in progress.
 See /docs for setup, deployment, and architecture guides.
