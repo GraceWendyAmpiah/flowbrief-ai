@@ -68,21 +68,21 @@ def test_save_case_writes_correct_item(mock_table):
 
 def test_get_case_returns_item_when_found(mock_table):
     sample_case = make_case()
-    mock_table.get_item.return_value = {"Item": sample_case}
+    mock_table.query.return_value = {"Items": [sample_case]}
 
     result = dynamo_service.get_case("some-uuid")
 
     assert result == sample_case
-    mock_table.get_item.assert_called_once_with(Key={"case_id": "some-uuid"})
+    mock_table.query.assert_called_once()
 
 
 def test_get_case_returns_none_when_not_found(mock_table):
-    mock_table.get_item.return_value = {}
+    mock_table.query.return_value = {"Items": []}
 
     result = dynamo_service.get_case("missing-uuid")
 
     assert result is None
-    mock_table.get_item.assert_called_once_with(Key={"case_id": "missing-uuid"})
+    mock_table.query.assert_called_once()
 
 
 def test_list_cases_filters_by_category(mock_table):

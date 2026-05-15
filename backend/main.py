@@ -1,5 +1,7 @@
 ﻿from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.requests import Request
+from fastapi.responses import JSONResponse
 
 from config.settings import settings
 from routers import cases, dashboard, process
@@ -18,6 +20,19 @@ app.add_middleware(
     allow_headers=["Content-Type"],
     allow_credentials=False,
 )
+
+@app.exception_handler(Exception)
+async def global_exception_handler(
+    request: Request, exc: Exception
+):
+    return JSONResponse(
+        status_code=500,
+        content={
+            "error": str(exc),
+            "code": "INTERNAL_ERROR",
+        },
+    )
+
 
 app.include_router(process.router)
 app.include_router(cases.router)

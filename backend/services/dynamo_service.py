@@ -1,5 +1,7 @@
 import boto3
 import botocore.exceptions
+from boto3.dynamodb.conditions import Key
+from botocore.exceptions import ClientError
 
 from config.settings import settings
 
@@ -26,11 +28,15 @@ def save_case(case_data: dict) -> None:
 
 def get_case(case_id: str) -> dict | None:
     try:
-        response = table.get_item(Key={"case_id": case_id})
-    except botocore.exceptions.ClientError as error:
-        raise _database_error(error) from error
-
-    return response.get("Item")
+        response = table.query(
+            KeyConditionExpression=Key("case_id").eq(case_id)
+        )
+        items = response.get("Items", [])
+        return items[0] if items else None
+    except ClientError as e:
+        raise RuntimeError(
+            f"DATABASE_ERROR: {e.response['Error']['Message']}"
+        )
 
 
 def list_cases(
