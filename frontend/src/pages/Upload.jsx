@@ -1,9 +1,9 @@
-import { useState, useRef } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Topbar from '../components/Topbar'
+import CaseCard from '../components/CaseCard'
 import Icon from '../components/Icon'
-
-// TODO Phase 21 — wire processDocument API call
+import { processDocument, listCases } from '../api/client'
 
 const CRUMB = [{ label: 'Home', href: '/' }, { label: 'New Case' }]
 
@@ -13,15 +13,46 @@ export default function Upload() {
   const [text, setText] = useState('')
   const [file, setFile] = useState(null)
   const [dragOver, setDragOver] = useState(false)
+  const [processing, setProcessing] = useState(false)
+  const [error, setError] = useState(null)
+  const [recentCases, setRecentCases] = useState([])
+  const [loadingRecent, setLoadingRecent] = useState(true)
   const fileInputRef = useRef(null)
 
-  const canSubmit = tab === 'paste' ? text.trim().length > 0 : !!file
+  useEffect(() => {
+    listCases({ limit: 5 })
+      .then((res) => setRecentCases(res.cases))
+      .catch(() => setRecentCases([]))
+      .finally(() => setLoadingRecent(false))
+  }, [])
+
+  const canSubmit =
+    !processing &&
+    (tab === 'paste' ? text.trim().length >= 20 : file !== null)
 
   const onDrop = (e) => {
     e.preventDefault()
     setDragOver(false)
     const f = e.dataTransfer.files[0]
     if (f) setFile(f)
+  }
+
+  const onSubmit = async () => {
+    setProcessing(true)
+    setError(null)
+    const formData = new FormData()
+    if (tab === 'paste') {
+      formData.append('text', text.trim())
+    } else {
+      formData.append('file', file)
+    }
+    try {
+      const res = await processDocument(formData)
+      navigate(`/cases/${res.case_id}`)
+    } catch (err) {
+      setError(err.message)
+      setProcessing(false)
+    }
   }
 
   return (
@@ -43,7 +74,7 @@ export default function Upload() {
             <button role="tab" aria-selected={tab === 'paste'} className={`tab ${tab === 'paste' ? 'is-active' : ''}`} onClick={() => setTab('paste')}>
               <Icon name="doc" size={14}/> Paste Text
             </button>
-            <button role="tab" aria-selected={tab === 'upload'} className={`tab ${tab === 'upload' ? 'is-active' : ''}`} onClick={() => setTab('upload')}>
+            <button role="tab" aria-selected={tab === 'file'} className={`tab ${tab === 'file' ? 'is-active' : ''}`} onClick={() => setTab('file')}>
               <Icon name="upload" size={14}/> Upload File
             </button>
           </div>
@@ -68,7 +99,7 @@ export default function Upload() {
               </div>
             )}
 
-            {tab === 'upload' && (
+            {tab === 'file' && (
               <div>
                 <label className="field__label" style={{ display: 'block', marginBottom: 6 }}>Document File</label>
                 <div
@@ -109,16 +140,22 @@ export default function Upload() {
 
             <div style={{ marginTop: 'var(--s-4)' }}>
               <button
-                className="btn btn--primary btn--block"
+                className={`btn btn--primary btn--block ${processing ? 'is-loading' : ''}`}
                 disabled={!canSubmit}
+                onClick={onSubmit}
               >
-                Process Document
+                {processing ? <><span className="spinner"/> Processing…</> : 'Process Document'}
               </button>
             </div>
+
+            {error && (
+              <div className="error-banner" style={{ marginTop: 'var(--s-3)' }}>
+                {error}
+              </div>
+            )}
           </div>
         </div>
 
-        {/* Recent Cases */}
         <div className="section-title">
           <h2>Recent Cases</h2>
           <div className="rule"/>
@@ -129,9 +166,27 @@ export default function Upload() {
 
         <div className="panel">
           <div className="recent-list">
-            <div style={{ padding: 'var(--s-8)', textAlign: 'center', color: 'var(--c-text-3)', fontSize: 13 }}>
-              No recent cases.
-            </div>
+            {loadingRecent ? (
+              <div style={{ padding: 'var(--s-8)', textAlign: 'center', color: 'var(--c-text-3)', fontSize: 13 }}>
+                Loading recent cases…
+              </div>
+            ) : recentCases.length === 0 ? (
+              <div style={{ padding: 'var(--s-8)', textAlign: 'center', color: 'var(--c-text-3)', fontSize: 13 }}>
+                No cases yet.
+              </div>
+            ) : (
+              recentCases.map((c) => (
+                <CaseCard
+                  key={c.case_id}
+                  id={c.case_id}
+                  classification={c.classification}
+                  urgency={c.urgency}
+                  customer={c.customer_name}
+                  requestType={c.request_type}
+                  created={new Date(c.created_at).getTime()}
+                />
+              ))
+            )}
           </div>
         </div>
       </div>
