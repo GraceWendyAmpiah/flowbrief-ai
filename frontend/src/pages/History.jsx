@@ -76,7 +76,7 @@ export default function History() {
             <div className="page__subtitle">Searchable archive of all processed cases</div>
           </div>
           <div className="page__head-actions">
-            <button className="btn"><Icon name="download" size={14}/> Export CSV</button>
+            <button type="button" className="btn"><Icon name="download" size={14}/> Export CSV</button>
           </div>
         </div>
 
@@ -88,7 +88,7 @@ export default function History() {
             onChange={(e) => setSearchInput(e.target.value)}
             onKeyDown={(e) => { if (e.key === 'Enter') handleSearch() }}
           />
-          <button className="btn" onClick={handleSearch}>
+          <button type="button" className="btn" onClick={handleSearch}>
             <Icon name="search" size={14}/> Search
           </button>
           <select
@@ -113,7 +113,7 @@ export default function History() {
             <option value="Medium">Medium</option>
             <option value="High">High</option>
           </select>
-          <button className="btn" onClick={handleClear}>
+          <button type="button" className="btn" onClick={handleClear}>
             Clear
           </button>
         </div>
@@ -160,6 +160,7 @@ export default function History() {
                     <td style={{ fontSize: 12, color: 'var(--c-text-2)' }}>{formatDate(c.created_at)}</td>
                     <td className="col-action">
                       <button
+                        type="button"
                         className="btn"
                         style={{ fontSize: 12 }}
                         onClick={(e) => { e.stopPropagation(); navigate(`/cases/${c.case_id}`) }}
@@ -178,6 +179,7 @@ export default function History() {
             </div>
             <div className="pagination__pager">
               <button
+                type="button"
                 className="btn"
                 disabled={page === 1}
                 onClick={() => setPage((p) => p - 1)}
@@ -188,6 +190,7 @@ export default function History() {
                 Page {page} of {totalPages}
               </div>
               <button
+                type="button"
                 className="btn"
                 disabled={page >= totalPages}
                 onClick={() => setPage((p) => p + 1)}

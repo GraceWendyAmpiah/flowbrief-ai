@@ -65,16 +65,16 @@ export default function Upload() {
             <div className="page__subtitle">Submit a customer document for AI extraction and routing</div>
           </div>
           <div className="page__head-actions">
-            <button className="btn"><Icon name="history" size={14}/> Open last case</button>
+            <button type="button" className="btn"><Icon name="history" size={14}/> Open last case</button>
           </div>
         </div>
 
         <div className="panel">
           <div className="tabs" role="tablist" style={{ padding: '0 var(--s-5)' }}>
-            <button role="tab" aria-selected={tab === 'paste'} className={`tab ${tab === 'paste' ? 'is-active' : ''}`} onClick={() => setTab('paste')}>
+            <button type="button" role="tab" aria-selected={tab === 'paste'} className={`tab ${tab === 'paste' ? 'is-active' : ''}`} onClick={() => setTab('paste')}>
               <Icon name="doc" size={14}/> Paste Text
             </button>
-            <button role="tab" aria-selected={tab === 'file'} className={`tab ${tab === 'file' ? 'is-active' : ''}`} onClick={() => setTab('file')}>
+            <button type="button" role="tab" aria-selected={tab === 'file'} className={`tab ${tab === 'file' ? 'is-active' : ''}`} onClick={() => setTab('file')}>
               <Icon name="upload" size={14}/> Upload File
             </button>
           </div>
@@ -129,7 +129,7 @@ export default function Upload() {
                       <Icon name="file" size={16}/>
                       <span>{file.name}</span>
                       <span className="dropzone__file-meta">{(file.size / 1024).toFixed(0)} KB</span>
-                      <button className="btn btn--ghost" style={{ padding: '2px 6px' }} onClick={() => setFile(null)} aria-label="Remove file">
+                      <button type="button" className="btn btn--ghost" style={{ padding: '2px 6px' }} onClick={() => setFile(null)} aria-label="Remove file">
                         <Icon name="x" size={14}/>
                       </button>
                     </div>
@@ -140,6 +140,7 @@ export default function Upload() {
 
             <div style={{ marginTop: 'var(--s-4)' }}>
               <button
+                type="button"
                 className={`btn btn--primary btn--block ${processing ? 'is-loading' : ''}`}
                 disabled={!canSubmit}
                 onClick={onSubmit}
@@ -159,7 +160,7 @@ export default function Upload() {
         <div className="section-title">
           <h2>Recent Cases</h2>
           <div className="rule"/>
-          <button className="btn btn--ghost" onClick={() => navigate('/history')} style={{ fontSize: 12 }}>
+          <button type="button" className="btn btn--ghost" onClick={() => navigate('/history')} style={{ fontSize: 12 }}>
             View all <Icon name="chev-right" size={12}/>
           </button>
         </div>
@@ -172,7 +173,7 @@ export default function Upload() {
               </div>
             ) : recentCases.length === 0 ? (
               <div style={{ padding: 'var(--s-8)', textAlign: 'center', color: 'var(--c-text-3)', fontSize: 13 }}>
-                No cases yet.
+                No cases have been processed.
               </div>
             ) : (
               recentCases.map((c) => (

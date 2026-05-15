@@ -64,7 +64,7 @@ export default function Report() {
               <div className="page__subtitle muted">{case_id}</div>
             </div>
             <div className="page__head-actions">
-              <button className="btn" onClick={() => navigate('/')}>
+              <button type="button" className="btn" onClick={() => navigate('/')}>
                 <Icon name="arrow-left" size={14}/> Back
               </button>
             </div>
@@ -84,11 +84,11 @@ export default function Report() {
             <div className="page__subtitle">AI-extracted handoff document · Verify all fields before processing</div>
           </div>
           <div className="page__head-actions">
-            <button className="btn" onClick={() => navigate('/')}>
+            <button type="button" className="btn" onClick={() => navigate('/')}>
               <Icon name="arrow-left" size={14}/> Back
             </button>
-            <button className="btn"><Icon name="print" size={14}/> Print</button>
-            <button className="btn"><Icon name="download" size={14}/> Export PDF</button>
+            <button type="button" className="btn"><Icon name="print" size={14}/> Print</button>
+            <button type="button" className="btn"><Icon name="download" size={14}/> Export PDF</button>
           </div>
         </div>
 

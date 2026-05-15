@@ -28,6 +28,7 @@ export default function Sidebar({ currentPath }) {
         <div className="sidebar__section-label">Workspace</div>
         {NAV_ITEMS.map(item => (
           <button
+            type="button"
             key={item.id}
             className={`nav-item ${isActive(item.path) ? 'is-active' : ''}`}
             onClick={() => navigate(item.path)}

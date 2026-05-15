@@ -14,7 +14,7 @@ function relTime(ts) {
 export default function CaseCard({ id, classification, urgency, customer, requestType, created }) {
   const navigate = useNavigate()
   return (
-    <button className="recent-row" onClick={() => navigate(`/cases/${id}`)}>
+    <button type="button" className="recent-row" onClick={() => navigate(`/cases/${id}`)}>
       <span className="recent-row__id">{id}</span>
       <CategoryBadge value={classification}/>
       <UrgencyBadge value={urgency}/>

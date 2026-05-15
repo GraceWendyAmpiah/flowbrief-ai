@@ -53,10 +53,10 @@ export default function Dashboard() {
             </div>
           </div>
           <div className="page__head-actions">
-            <button className="btn" onClick={load} disabled={loading}>
+            <button type="button" className="btn" onClick={load} disabled={loading}>
               <Icon name="refresh" size={14}/> Refresh
             </button>
-            <button className="btn"><Icon name="download" size={14}/> Export CSV</button>
+            <button type="button" className="btn"><Icon name="download" size={14}/> Export CSV</button>
           </div>
         </div>
 
@@ -90,7 +90,7 @@ export default function Dashboard() {
                     <XAxis type="number" tick={{ fontSize: 11 }} allowDecimals={false}/>
                     <YAxis type="category" dataKey="name" width={120} tick={{ fontSize: 12 }}/>
                     <Tooltip/>
-                    <Bar dataKey="count" fill="#1C7ED6" barSize={22}>
+                    <Bar dataKey="count" fill="var(--c-blue)" barSize={22}>
                       <LabelList dataKey="count" position="right" style={{ fontSize: 11 }}/>
                     </Bar>
                   </BarChart>
