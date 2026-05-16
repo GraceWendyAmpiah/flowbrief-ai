@@ -54,3 +54,5 @@ desktop.ini
 
 # Local execution reports
 reports/
+
+.claude/
