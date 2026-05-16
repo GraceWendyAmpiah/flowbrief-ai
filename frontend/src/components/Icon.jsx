@@ -23,6 +23,7 @@ export default function Icon({ name, size = 16, className }) {
     case 'print': return <svg {...props}><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
     case 'paperclip': return <svg {...props}><path d="m21 12-9.6 9.6a4 4 0 0 1-5.6-5.6L15 7a3 3 0 0 1 4 4l-9.6 9.6"/></svg>
     case 'x': return <svg {...props}><path d="M18 6 6 18M6 6l12 12"/></svg>
+    case 'user': return <svg {...props}><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
     default: return null
   }
 }

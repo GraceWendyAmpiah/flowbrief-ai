@@ -18,9 +18,17 @@ export default function Topbar({ crumb, meta }) {
       </nav>
       <div className="topbar__meta">
         {meta}
-        <div className="topbar__user">
-          <span className="topbar__avatar">AO</span>
-          <span>A. Owusu · Operations</span>
+        <div style={{
+          width: 32,
+          height: 32,
+          borderRadius: 'var(--r-md)',
+          border: '1px solid var(--c-border)',
+          background: 'var(--c-bg-2)',
+          display: 'grid',
+          placeItems: 'center',
+          color: 'var(--c-text-3)'
+        }}>
+          <Icon name="user" size={16} />
         </div>
       </div>
     </header>

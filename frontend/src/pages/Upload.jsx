@@ -113,14 +113,16 @@ export default function Upload() {
                 >
                   <Icon name="upload" size={28}/>
                   <div className="dropzone__title">Drop file here or click to browse</div>
-                  <div className="dropzone__hint">PDF, JPG or PNG · 10 MB maximum</div>
+                  <div className="dropzone__hint">PDF, JPG, PNG, MD or TXT · 10 MB maximum</div>
                   <div className="dropzone__types">
                     <span className="filetype">PDF</span>
                     <span className="filetype">JPG</span>
                     <span className="filetype">PNG</span>
+                    <span className="filetype">MD</span>
+                    <span className="filetype">TXT</span>
                   </div>
                   <input
-                    ref={fileInputRef} type="file" accept=".pdf,.jpg,.jpeg,.png"
+                    ref={fileInputRef} type="file" accept=".pdf,.jpg,.jpeg,.png,.md,.txt"
                     style={{ display: 'none' }}
                     onChange={(e) => setFile(e.target.files[0])}
                   />

@@ -34,6 +34,10 @@ export default function Report() {
       .catch((err) => { setError(err.message); setLoading(false) })
   }, [case_id])
 
+  const handleExportPdf = () => {
+    window.print()
+  }
+
   const crumb = [
     { label: 'Home', href: '/' },
     { label: 'Cases', href: '/history' },
@@ -88,7 +92,13 @@ export default function Report() {
               <Icon name="arrow-left" size={14}/> Back
             </button>
             <button type="button" className="btn"><Icon name="print" size={14}/> Print</button>
-            <button type="button" className="btn"><Icon name="download" size={14}/> Export PDF</button>
+            <button
+              type="button"
+              className="btn"
+              onClick={handleExportPdf}
+            >
+              <Icon name="download" size={14}/> Export PDF
+            </button>
           </div>
         </div>
 

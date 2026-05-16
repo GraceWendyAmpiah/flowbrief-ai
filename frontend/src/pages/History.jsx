@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import Topbar from '../components/Topbar'
 import CategoryBadge from '../components/CategoryBadge'
 import UrgencyBadge from '../components/UrgencyBadge'
@@ -22,6 +22,7 @@ function formatDate(iso) {
 
 export default function History() {
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
   const [cases, setCases] = useState([])
   const [total, setTotal] = useState(0)
   const [loading, setLoading] = useState(true)
@@ -33,15 +34,29 @@ export default function History() {
   const [page, setPage] = useState(1)
 
   useEffect(() => {
+    const cat = searchParams.get('category') || ''
+    const urg = searchParams.get('urgency') || ''
+    if (cat) setCategory(cat)
+    if (urg) setUrgency(urg)
+  }, [])
+
+  useEffect(() => {
     setLoading(true)
-    listCases({ search, category, urgency, page, limit: LIMIT })
-      .then((res) => {
-        setCases(res.cases)
-        setTotal(res.total)
+    setError(null)
+    listCases({
+      search: search || undefined,
+      category: category || undefined,
+      urgency: urgency || undefined,
+      page,
+      limit: LIMIT
+    })
+      .then((data) => {
+        setCases(data.cases || [])
+        setTotal(data.total || 0)
         setLoading(false)
       })
       .catch((err) => {
-        setError(err.message)
+        setError(err.message || 'Failed to load cases')
         setLoading(false)
       })
   }, [search, category, urgency, page])

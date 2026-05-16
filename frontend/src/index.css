@@ -920,3 +920,23 @@ input, textarea, select { font-family: inherit; font-size: inherit; color: inher
   .field-grid { grid-template-columns: 1fr; }
   .field-card--wide { grid-column: span 1; }
 }
+
+/* Print stylesheet for PDF export */
+@media print {
+  .sidebar { display: none !important; }
+  .topbar { display: none !important; }
+  .page__head-actions { display: none !important; }
+  .statusbar__badges .btn { display: none !important; }
+  .handoff__head button { display: none !important; }
+  .section-title button { display: none !important; }
+  .main { grid-column: 1 / -1; }
+  .app { display: block; }
+  .page { padding: 0; max-width: 100%; }
+  .escalation { break-inside: avoid; }
+  .field-grid { break-inside: avoid; }
+  .handoff__body { font-size: 12px; }
+  @page {
+    margin: 20mm;
+    size: A4;
+  }
+}
