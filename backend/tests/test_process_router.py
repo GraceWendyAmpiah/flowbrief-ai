@@ -85,7 +85,7 @@ def test_text_under_20_characters_returns_400():
 def test_invalid_file_mime_type_returns_400():
     response = client.post(
         "/api/process",
-        files={"file": ("notes.txt", b"plain text", "text/plain")},
+        files={"file": ("notes.txt", b"plain text", "text/html")},
     )
 
     assert response.status_code == 400
