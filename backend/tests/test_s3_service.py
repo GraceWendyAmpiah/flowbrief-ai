@@ -30,9 +30,9 @@ def test_validate_file_passes_for_valid_png():
     s3_service.validate_file("image.png", "image/png", 1024)
 
 
-def test_validate_file_rejects_invalid_mime_type():
+def test_validate_file_rejects_html_mime_type():
     with pytest.raises(ValueError) as exc_info:
-        s3_service.validate_file("notes.txt", "text/plain", 1024)
+        s3_service.validate_file("page.html", "text/html", 1024)
 
     assert "INVALID_FILE_TYPE" in str(exc_info.value)
 

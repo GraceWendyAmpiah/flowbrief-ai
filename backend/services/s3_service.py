@@ -8,6 +8,8 @@ ACCEPTED_MIME_TYPES = {
     "application/pdf",
     "image/jpeg",
     "image/png",
+    "text/plain",
+    "text/markdown",
 }
 MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024
 
@@ -22,7 +24,7 @@ s3_client = boto3.client(
 def validate_file(filename, content_type, size_bytes) -> None:
     if content_type not in ACCEPTED_MIME_TYPES:
         raise ValueError(
-            "INVALID_FILE_TYPE: accepted types are application/pdf, image/jpeg, image/png"
+            "INVALID_FILE_TYPE: accepted types are application/pdf, image/jpeg, image/png, text/plain, text/markdown"
         )
 
     if size_bytes > MAX_FILE_SIZE_BYTES:
