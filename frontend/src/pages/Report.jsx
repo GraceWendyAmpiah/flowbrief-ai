@@ -35,7 +35,16 @@ export default function Report() {
   }, [case_id])
 
   const handleExportPdf = () => {
-    window.print()
+    if (!caseData) return
+    const blob = new Blob([caseData.handoff_report], {
+      type: 'text/markdown'
+    })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `handoff_${caseData.case_id.slice(0, 8)}.md`
+    a.click()
+    URL.revokeObjectURL(url)
   }
 
   const crumb = [
@@ -97,7 +106,7 @@ export default function Report() {
               className="btn"
               onClick={handleExportPdf}
             >
-              <Icon name="download" size={14}/> Export PDF
+              <Icon name="download" size={14}/> Download Report
             </button>
           </div>
         </div>
